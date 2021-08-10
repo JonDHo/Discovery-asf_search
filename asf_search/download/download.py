@@ -67,6 +67,10 @@ def download_url(url: str, path: str, filename: str = None, session: ASFSession 
     while 300 <= response.status_code <= 399:
         new_url = response.headers['location']
         print(f'Redirect to {new_url}')
+        params = urllib.parse.parse_qs(urllib.parse.urlparse(new_url).query)
+        if params.get('X-Amz-Algorithm'):
+            session.headers.pop('authorization',None)
+        response = session.get(new_url, stream=True, allow_redirects=False)
         response = session.get(new_url, stream=True, allow_redirects=False)
         print(f'response: {response.status_code}')
     response.raise_for_status()
